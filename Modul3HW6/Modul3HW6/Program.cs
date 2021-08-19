@@ -6,7 +6,8 @@ namespace Modul3HW6
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var start = new Startup();
+            start.Run().GetAwaiter().GetResult();
         }
     }
 }

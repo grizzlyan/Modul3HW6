@@ -2,6 +2,6 @@
 {
     public class Config
     {
-        public LoggerConfig Logger { get; set; }
+        public LoggerConfig LoggerConfig { get; set; }
     }
 }

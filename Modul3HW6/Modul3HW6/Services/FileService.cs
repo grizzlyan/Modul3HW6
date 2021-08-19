@@ -16,15 +16,22 @@ namespace Modul3HW6.Services
             return new StreamWriter(path, true, Encoding.Default);
         }
 
+        public IDisposable CreateStreamForRead(string path)
+        {
+            return new StreamReader(path, Encoding.Default);
+        }
+
         public async Task WriteToStreamAsync(IDisposable stream, string text)
         {
             var streamWriter = (StreamWriter)stream;
             await streamWriter.WriteLineAsync(text);
+            await streamWriter.FlushAsync();
         }
 
-        public async Task<string> ReadAllTextAsync(string path)
+        public async Task<string> ReadAllTextAsync(IDisposable stream)
         {
-           return await File.ReadAllTextAsync(path);
+            var streamReader = (StreamReader)stream;
+            return await streamReader.ReadToEndAsync();
         }
 
         public void Delete(string path)

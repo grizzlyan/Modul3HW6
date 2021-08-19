@@ -1,9 +1,11 @@
-﻿namespace Modul3HW6.Services.Abstractions
+﻿using System.Threading.Tasks;
+
+namespace Modul3HW6.Services
 {
     public interface IActions
     {
-        bool InfoMethod();
-        bool WarningMethod();
-        bool ErrorMethod();
+        Task<bool> InfoMethod(string methodNumber);
+        bool WarningMethod(string methodNumber);
+        bool ErrorMethod(string methodNumber);
     }
 }

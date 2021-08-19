@@ -9,22 +9,26 @@ namespace Modul3HW6.Services
 {
     public class LoggerService : IAsyncLoggerService
     {
-        private readonly Config _config;
+        private readonly IConfigService _config;
         private readonly SemaphoreSlim _semaphoreSlim;
-        private readonly DirectoryService _directoryService;
-        private readonly FileService _fileService;
+        private readonly IDirectoryService _directoryService;
+        private readonly IAsyncFileService _fileService;
         private IDisposable _fileStreamWriter;
-        private int _counter = 1;
+        private IDisposable _fileStreamReader;
+        private int _counter = 0;
         private string _previousLog = string.Empty;
         private string _filePath;
 
-        public LoggerService()
+        public LoggerService(
+            IConfigService config,
+            IDirectoryService directoryService,
+            IAsyncFileService fileService)
         {
             _semaphoreSlim = new SemaphoreSlim(1);
-            _config = new Config();
-            _directoryService = new DirectoryService();
-            _fileService = new FileService();
-            _directoryService.DeleteDirectory(_config.Logger.DirectoryPath);
+            _config = config;
+            _directoryService = directoryService;
+            _fileService = fileService;
+            _directoryService.DeleteDirectory(_config.LoggerConfig.DirectoryPath);
             Init();
         }
 
@@ -56,7 +60,7 @@ namespace Modul3HW6.Services
                     await _fileService.WriteToStreamAsync(_fileStreamWriter, _previousLog);
                 }
 
-                while (!IsBackUpCount.Invoke(_counter, _config.Logger.BackUpCount))
+                while (!IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
                 {
                     var log = $"{DateTime.UtcNow}:{logType}:{message}";
 
@@ -64,9 +68,12 @@ namespace Modul3HW6.Services
                     _counter++;
                 }
 
-                _previousLog = await _fileService.ReadAllTextAsync(_filePath);
+                _fileStreamWriter.Dispose();
+                _fileStreamReader = _fileService.CreateStreamForRead(_filePath);
+                _previousLog = await _fileService.ReadAllTextAsync(_fileStreamReader);
+                _fileStreamReader.Dispose();
                 Init();
-                _counter = 1;
+                _counter = 0;
             }
             finally
             {
@@ -76,11 +83,11 @@ namespace Modul3HW6.Services
 
         private void Init()
         {
-            var directoryPath = _config.Logger.DirectoryPath;
+            var directoryPath = _config.LoggerConfig.DirectoryPath;
             _directoryService.CreateDirectory(directoryPath);
 
-            var fileName = $"{DateTime.UtcNow.ToString(_config.Logger.NameFormat)}";
-            _filePath = $"{directoryPath}{fileName}{_config.Logger.ExtensionFile}";
+            var fileName = $"{DateTime.UtcNow.ToString(_config.LoggerConfig.NameFormat)}";
+            _filePath = $"{directoryPath}{fileName}{_config.LoggerConfig.ExtensionFile}";
 
             _fileStreamWriter = _fileService.CreateStreamForWrite(_filePath);
         }

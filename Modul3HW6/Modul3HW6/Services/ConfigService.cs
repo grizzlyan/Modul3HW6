@@ -17,7 +17,7 @@ namespace Modul3HW6.Services
         public ConfigService()
         {
             var config = GetConfig();
-            _loggerConfig = config.Logger;
+            _loggerConfig = config.LoggerConfig;
         }
 
         public LoggerConfig LoggerConfig => _loggerConfig;

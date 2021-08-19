@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Modul3HW6.Helpers;
-using Modul3HW6.Services.Abstractions;
 
 namespace Modul3HW6.Services
 {
@@ -14,20 +14,20 @@ namespace Modul3HW6.Services
             _logger = logger;
         }
 
-        public bool InfoMethod()
+        public async Task<bool> InfoMethod(string methodNumber)
         {
-            _logger.LogInfo($"Start method: {nameof(InfoMethod)}");
+            await _logger.LogInfo($"Start method: {nameof(InfoMethod)}. From starter method - {methodNumber}.");
             return true;
         }
 
-        public bool WarningMethod()
+        public bool WarningMethod(string methodNumber)
         {
-            throw new BusinessException("Skipped logic in method");
+            throw new BusinessException($"Skipped logic in method. From starter method - {methodNumber}.");
         }
 
-        public bool ErrorMethod()
+        public bool ErrorMethod(string methodNumber)
         {
-            throw new Exception("I broke a logic");
+            throw new Exception($"I broke a logic. From starter method - {methodNumber}.");
         }
     }
 }

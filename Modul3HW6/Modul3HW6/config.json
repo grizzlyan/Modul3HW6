@@ -1,5 +1,5 @@
 {
-  "Logger": {
+  "LoggerConfig": {
     "DirectoryPath": "Backup/",
     "ExtensionFile": ".txt",
     "NameFormat": "hh.mm.ss.ffff dd.MM.yyyy",
