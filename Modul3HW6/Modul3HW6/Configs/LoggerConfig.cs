@@ -4,6 +4,7 @@
     {
         public string DirectoryPath { get; set; }
         public string ExtensionFile { get; set; }
+        public string LogFileName { get; set; }
         public string NameFormat { get; set; }
         public int BackUpCount { get; set; }
     }

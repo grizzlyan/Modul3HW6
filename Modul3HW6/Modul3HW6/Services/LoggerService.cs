@@ -13,10 +13,11 @@ namespace Modul3HW6.Services
         private readonly SemaphoreSlim _semaphoreSlim;
         private readonly IDirectoryService _directoryService;
         private readonly IAsyncFileService _fileService;
-        private IDisposable _fileStreamWriter;
-        private IDisposable _fileStreamReader;
+        private IDisposable _backupWriter;
+        private IDisposable _logsWriter;
+        private string _logFileName;
         private int _counter = 0;
-        private string _previousLog = string.Empty;
+
         private string _filePath;
 
         public LoggerService(
@@ -28,7 +29,6 @@ namespace Modul3HW6.Services
             _config = config;
             _directoryService = directoryService;
             _fileService = fileService;
-            _directoryService.DeleteDirectory(_config.LoggerConfig.DirectoryPath);
             Init();
         }
 
@@ -53,39 +53,50 @@ namespace Modul3HW6.Services
         {
             await _semaphoreSlim.WaitAsync();
 
-            if (_counter == 0 && !string.IsNullOrEmpty(_previousLog))
-            {
-                await _fileService.WriteToStreamAsync(_fileStreamWriter, _previousLog);
-            }
+            var log = $"{DateTime.UtcNow.ToString(_config.LoggerConfig.NameFormat)}: {logType}: {message}";
 
-            if (!IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
-            {
-                var log = $"{DateTime.UtcNow}:{logType}:{message}";
+            await _fileService.WriteToStreamAsync(_logsWriter, log);
 
-                await _fileService.WriteToStreamAsync(_fileStreamWriter, log);
-                _counter++;
-            }
-            else
+            _counter++;
+
+            if (IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
             {
-                _fileStreamWriter.Dispose();
-                _fileStreamReader = _fileService.CreateStreamForRead(_filePath);
-                _previousLog = await _fileService.ReadAllTextAsync(_fileStreamReader);
-                Init();
-                _counter = 0;
+                await PrintBackup();
             }
 
             _semaphoreSlim.Release();
         }
 
+        private async Task PrintBackup()
+        {
+            _logsWriter.Dispose();
+            var log = await _fileService.ReadAllTextAsync(_logFileName);
+            var fileName = $"{DateTime.UtcNow.ToString(_config.LoggerConfig.NameFormat)}";
+            _filePath = $"{_config.LoggerConfig.DirectoryPath}{fileName}{_config.LoggerConfig.ExtensionFile}";
+            _backupWriter = _fileService.CreateStreamForWrite(_filePath);
+            await _fileService.WriteToStreamAsync(_backupWriter, log);
+            _counter = 0;
+            CreateLogWriter();
+        }
+
         private void Init()
         {
+            _logFileName = $"{_config.LoggerConfig.LogFileName}{_config.LoggerConfig.ExtensionFile}";
+            _fileService.Delete(_logFileName);
+
             var directoryPath = _config.LoggerConfig.DirectoryPath;
+            if (_directoryService.Exists(directoryPath))
+            {
+                _directoryService.DeleteDirectory(directoryPath);
+            }
+
             _directoryService.CreateDirectory(directoryPath);
+            CreateLogWriter();
+        }
 
-            var fileName = $"{DateTime.UtcNow.ToString(_config.LoggerConfig.NameFormat)}";
-            _filePath = $"{directoryPath}{fileName}{_config.LoggerConfig.ExtensionFile}";
-
-            _fileStreamWriter = _fileService.CreateStreamForWrite(_filePath);
+        private void CreateLogWriter()
+        {
+            _logsWriter = _fileService.CreateStreamForWrite(_logFileName);
         }
     }
 }

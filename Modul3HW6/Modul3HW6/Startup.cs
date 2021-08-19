@@ -13,7 +13,7 @@ namespace Modul3HW6
         public void Run()
         {
             var serviceProvider = new ServiceCollection()
-                .AddTransient<IActions, Actions>()
+                .AddTransient<IAsyncActions, Actions>()
                 .AddTransient<IConfigService, ConfigService>()
                 .AddTransient<IDirectoryService, DirectoryService>()
                 .AddTransient<IAsyncFileService, FileService>()

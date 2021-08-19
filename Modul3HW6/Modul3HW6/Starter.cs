@@ -13,12 +13,12 @@ namespace Modul3HW6
     public class Starter
     {
         private const int MaxValue = 3;
-        private readonly IActions _actions;
+        private readonly IAsyncActions _actions;
         private readonly IAsyncLoggerService _logger;
         private readonly Random _rnd = new Random();
 
         public Starter(
-            IActions actions,
+            IAsyncActions actions,
             IAsyncLoggerService logger)
         {
             _logger = logger;
@@ -28,7 +28,7 @@ namespace Modul3HW6
 
         public async Task Run()
         {
-            await Task.WhenAll(new[] { Task.Run(() => RunAsync("Method1")), Task.Run(() => RunAsync("Method2")) });
+            await Task.WhenAll(new[] { Task.Run(() => RunAsync("MethodOne")), Task.Run(() => RunAsync("MethodTwo")) });
         }
 
         private async Task RunAsync(string methodNumber)
@@ -40,7 +40,7 @@ namespace Modul3HW6
                     switch (_rnd.Next(MaxValue))
                     {
                         case 0:
-                            await _actions.InfoMethod(methodNumber);
+                            await _actions.InfoMethodAsync(methodNumber);
                             break;
                         case 1:
                             _actions.WarningMethod(methodNumber);
@@ -52,7 +52,7 @@ namespace Modul3HW6
                 }
                 catch (BusinessException ex)
                 {
-                    await _logger.LogWarning($"Action got this custom Exception : {ex.Message}");
+                    await _logger.LogWarning($"Action got this custom Exception: {ex.Message}");
                 }
                 catch (Exception ex)
                 {

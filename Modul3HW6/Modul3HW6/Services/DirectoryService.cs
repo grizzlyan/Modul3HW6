@@ -11,14 +11,17 @@ namespace Modul3HW6.Services
 
         public void DeleteDirectory(string path)
         {
-            if (Directory.Exists(path))
-            {
                 Directory.Delete(path, true);
-            }
         }
 
-        public string[] GetFiles(string path) => Directory.GetFiles(path);
+        public string[] GetFiles(string path)
+        {
+            return Directory.GetFiles(path);
+        }
 
-        public bool Exists(string path) => Directory.Exists(path);
+        public bool Exists(string path)
+        {
+            return Directory.Exists(path);
+        }
     }
 }

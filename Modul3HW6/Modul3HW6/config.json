@@ -2,6 +2,7 @@
   "LoggerConfig": {
     "DirectoryPath": "Backup/",
     "ExtensionFile": ".txt",
+    "LogFileName": "Logs",
     "NameFormat": "hh.mm.ss.ffff dd.MM.yyyy",
     "BackUpCount": 10
   }

@@ -2,9 +2,9 @@
 
 namespace Modul3HW6.Services
 {
-    public interface IActions
+    public interface IAsyncActions
     {
-        Task<bool> InfoMethod(string methodNumber);
+        Task<bool> InfoMethodAsync(string methodNumber);
         bool WarningMethod(string methodNumber);
         bool ErrorMethod(string methodNumber);
     }

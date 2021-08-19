@@ -28,10 +28,9 @@ namespace Modul3HW6.Services
             await streamWriter.FlushAsync();
         }
 
-        public async Task<string> ReadAllTextAsync(IDisposable stream)
+        public async Task<string> ReadAllTextAsync(string path)
         {
-            var streamReader = (StreamReader)stream;
-            return await streamReader.ReadToEndAsync();
+            return await File.ReadAllTextAsync(path);
         }
 
         public void Delete(string path)
