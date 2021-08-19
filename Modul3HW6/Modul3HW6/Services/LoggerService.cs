@@ -58,7 +58,7 @@ namespace Modul3HW6.Services
                 await _fileService.WriteToStreamAsync(_fileStreamWriter, _previousLog);
             }
 
-            if (!IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
+            if (IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
             {
                 var log = $"{DateTime.UtcNow}:{logType}:{message}";
 
@@ -70,7 +70,6 @@ namespace Modul3HW6.Services
                 _fileStreamWriter.Dispose();
                 _fileStreamReader = _fileService.CreateStreamForRead(_filePath);
                 _previousLog = await _fileService.ReadAllTextAsync(_fileStreamReader);
-                _fileStreamReader.Dispose();
                 Init();
                 _counter = 0;
             }

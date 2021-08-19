@@ -12,9 +12,11 @@ namespace Modul3HW6
 {
     public class Starter
     {
+        private const int MaxValue = 3;
         private readonly IActions _actions;
         private readonly IAsyncLoggerService _logger;
-        private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1);
+        private readonly Random _rnd = new Random();
+
         public Starter(
             IActions actions,
             IAsyncLoggerService logger)
@@ -31,14 +33,11 @@ namespace Modul3HW6
 
         private async Task RunAsync(string methodNumber)
         {
-            var rnd = new Random();
-            var maxValue = 3;
-
             for (var i = 0; i < 50; i++)
             {
                 try
                 {
-                    switch (rnd.Next(maxValue))
+                    switch (_rnd.Next(MaxValue))
                     {
                         case 0:
                             await _actions.InfoMethod(methodNumber);
