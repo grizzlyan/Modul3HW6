@@ -24,6 +24,7 @@ namespace Modul3HW6.Services
         public async Task WriteToStreamAsync(IDisposable stream, string text)
         {
             var streamWriter = (StreamWriter)stream;
+            await streamWriter.FlushAsync();
             await streamWriter.WriteLineAsync(text);
             await streamWriter.FlushAsync();
         }

@@ -53,7 +53,7 @@ namespace Modul3HW6.Services
         {
             await _semaphoreSlim.WaitAsync();
 
-            if (!string.IsNullOrEmpty(_previousLog))
+            if (_counter == 0 && !string.IsNullOrEmpty(_previousLog))
             {
                 await _fileService.WriteToStreamAsync(_fileStreamWriter, _previousLog);
             }
@@ -73,8 +73,9 @@ namespace Modul3HW6.Services
                 _fileStreamReader.Dispose();
                 Init();
                 _counter = 0;
-                _semaphoreSlim.Release();
             }
+
+            _semaphoreSlim.Release();
         }
 
         private void Init()
