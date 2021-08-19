@@ -53,30 +53,26 @@ namespace Modul3HW6.Services
         {
             await _semaphoreSlim.WaitAsync();
 
-            try
+            if (!string.IsNullOrEmpty(_previousLog))
             {
-                if (!string.IsNullOrEmpty(_previousLog))
-                {
-                    await _fileService.WriteToStreamAsync(_fileStreamWriter, _previousLog);
-                }
+                await _fileService.WriteToStreamAsync(_fileStreamWriter, _previousLog);
+            }
 
-                while (!IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
-                {
-                    var log = $"{DateTime.UtcNow}:{logType}:{message}";
+            if (!IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
+            {
+                var log = $"{DateTime.UtcNow}:{logType}:{message}";
 
-                    await _fileService.WriteToStreamAsync(_fileStreamWriter, log);
-                    _counter++;
-                }
-
+                await _fileService.WriteToStreamAsync(_fileStreamWriter, log);
+                _counter++;
+            }
+            else
+            {
                 _fileStreamWriter.Dispose();
                 _fileStreamReader = _fileService.CreateStreamForRead(_filePath);
                 _previousLog = await _fileService.ReadAllTextAsync(_fileStreamReader);
                 _fileStreamReader.Dispose();
                 Init();
                 _counter = 0;
-            }
-            finally
-            {
                 _semaphoreSlim.Release();
             }
         }

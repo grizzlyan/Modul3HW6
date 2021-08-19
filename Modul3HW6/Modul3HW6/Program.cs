@@ -7,7 +7,7 @@ namespace Modul3HW6
         private static void Main(string[] args)
         {
             var start = new Startup();
-            start.Run().GetAwaiter().GetResult();
+            start.Run();
         }
     }
 }

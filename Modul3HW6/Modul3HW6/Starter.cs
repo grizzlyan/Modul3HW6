@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Modul3HW6.Configs;
 using Modul3HW6.Helpers;
@@ -13,7 +14,7 @@ namespace Modul3HW6
     {
         private readonly IActions _actions;
         private readonly IAsyncLoggerService _logger;
-
+        private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1);
         public Starter(
             IActions actions,
             IAsyncLoggerService logger)
@@ -23,26 +24,9 @@ namespace Modul3HW6
             _logger.IsBackUpCount += CompareNumbers;
         }
 
-        public async Task Run()
+        public void Run()
         {
-            await Task.WhenAll(new[]
-            {
-                Task.Run(() =>
-                {
-                    for (var i = 0; i < 50; i++)
-                    {
-                        Task.Run(async () => await RunAsync("MethodOne"));
-                    }
-                }),
-
-                Task.Run(() =>
-                {
-                    for (var i = 0; i < 50; i++)
-                    {
-                        Task.Run(async () => await RunAsync("MethodTwo"));
-                    }
-                })
-            });
+            Task.WaitAll(new[] { Task.Run(() => RunAsync("Method1")), Task.Run(() => RunAsync("Method2")) });
         }
 
         private async Task RunAsync(string methodNumber)
@@ -50,28 +34,31 @@ namespace Modul3HW6
             var rnd = new Random();
             var maxValue = 3;
 
-            try
+            for (var i = 0; i < 50; i++)
             {
-                switch (rnd.Next(maxValue))
+                try
                 {
-                    case 0:
-                        await _actions.InfoMethod(methodNumber);
-                        break;
-                    case 1:
-                        _actions.WarningMethod(methodNumber);
-                        break;
-                    case 2:
-                        _actions.ErrorMethod(methodNumber);
-                        break;
+                    switch (rnd.Next(maxValue))
+                    {
+                        case 0:
+                            await _actions.InfoMethod(methodNumber);
+                            break;
+                        case 1:
+                            _actions.WarningMethod(methodNumber);
+                            break;
+                        case 2:
+                            _actions.ErrorMethod(methodNumber);
+                            break;
+                    }
                 }
-            }
-            catch (BusinessException ex)
-            {
-                await _logger.LogWarning($"Action got this custom Exception : {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError($"Action failed by reason: {ex.Message}");
+                catch (BusinessException ex)
+                {
+                    await _logger.LogWarning($"Action got this custom Exception : {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    await _logger.LogError($"Action failed by reason: {ex.Message}");
+                }
             }
         }
 

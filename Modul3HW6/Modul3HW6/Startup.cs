@@ -10,7 +10,7 @@ namespace Modul3HW6
 {
     public class Startup
     {
-        public async Task Run()
+        public void Run()
         {
             var serviceProvider = new ServiceCollection()
                 .AddTransient<IActions, Actions>()
@@ -22,7 +22,7 @@ namespace Modul3HW6
                 .BuildServiceProvider();
 
             var start = serviceProvider.GetService<Starter>();
-            await start.Run();
+            start.Run();
         }
     }
 }
