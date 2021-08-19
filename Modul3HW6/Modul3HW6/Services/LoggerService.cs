@@ -58,7 +58,7 @@ namespace Modul3HW6.Services
                 await _fileService.WriteToStreamAsync(_fileStreamWriter, _previousLog);
             }
 
-            if (IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
+            if (!IsBackUpCount.Invoke(_counter, _config.LoggerConfig.BackUpCount))
             {
                 var log = $"{DateTime.UtcNow}:{logType}:{message}";
 

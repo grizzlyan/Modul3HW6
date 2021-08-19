@@ -26,9 +26,9 @@ namespace Modul3HW6
             _logger.IsBackUpCount += CompareNumbers;
         }
 
-        public void Run()
+        public async Task Run()
         {
-            Task.WaitAll(new[] { Task.Run(() => RunAsync("Method1")), Task.Run(() => RunAsync("Method2")) });
+            await Task.WhenAll(new[] { Task.Run(() => RunAsync("Method1")), Task.Run(() => RunAsync("Method2")) });
         }
 
         private async Task RunAsync(string methodNumber)

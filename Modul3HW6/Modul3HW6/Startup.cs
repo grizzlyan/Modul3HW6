@@ -22,7 +22,7 @@ namespace Modul3HW6
                 .BuildServiceProvider();
 
             var start = serviceProvider.GetService<Starter>();
-            start.Run();
+            start.Run().GetAwaiter().GetResult();
         }
     }
 }
